@@ -46,10 +46,19 @@ export default function RegisterForm() {
                 await updateProfile(auth.currentUser, { displayName: `${user.firstName} ${user.lastName}` });
 
                 await createUser(user.email, user.firstName, user.lastName, user.username, userCredential.user.uid);
-                await signOut(auth);
                 await sendEmailVerification(auth.currentUser);
+                await signOut(auth);
                 setModalMessage('Verification email sent. Please check your inbox.');
                 setShowModal(true);
+                setUser({
+                    firstName: '',
+                    lastName: '',
+                    username: '',
+                    email: '',
+                    password: '',
+                });
+                setConfirmPassword('');
+                navigate('/login');
                 return;
             }
         } catch (err: unknown) {
@@ -65,19 +74,6 @@ export default function RegisterForm() {
         } finally {
             setLoading(false);
         }
-        if (!error) {
-            setModalMessage('Registration successful! Please log in.');
-            setShowModal(true);
-            setUser({
-                firstName: '',
-                lastName: '',
-                username: '',
-                email: '',
-                password: '',
-            });
-            setConfirmPassword('');
-            navigate('/login');
-        }
     };
 
     const updateUser = (field: string, value: string) => {
@@ -89,8 +85,8 @@ export default function RegisterForm() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-slate-50">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+            <div className="flex items-center justify-center h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
             </div>
         );
     }

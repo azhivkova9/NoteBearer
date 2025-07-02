@@ -1,4 +1,4 @@
-import { ref, set } from "firebase/database";
+import { equalTo, get, orderByChild, query, ref, set } from "firebase/database";
 import { db } from "../config/firebase-config";
 
 interface User {
@@ -40,3 +40,32 @@ export const createUser = async (
     throw new Error('Failed to create user in the database');
   }
 };
+
+export const getUserByEmail = async (
+  userEmail: string,
+) : Promise<User> => {
+
+  const userRef = ref(db, 'users');
+  const snapshot = await get(userRef);
+  const users = snapshot.val();
+
+  if (users) {
+    for (const username in users) {
+      if (users[username].email === userEmail) {
+        return users[username] as User;
+      }
+    }
+  }
+  return Promise.reject(new Error('User not found'));
+}
+
+export const getUserData = async (
+  userId: string
+) : Promise<User> => {
+  const snapshot = await get(query(ref(db, 'users'), orderByChild('uid'), equalTo(userId)));
+
+  if(snapshot.exists()) {
+    return snapshot.val();
+  }
+  return Promise.reject(new Error('User data not found'));
+}
