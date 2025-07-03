@@ -1,5 +1,6 @@
 import { equalTo, get, orderByChild, query, ref, set } from "firebase/database";
 import { db } from "../config/firebase-config";
+import type { AppUserData } from "../types/UserTypes";
 
 interface User {
   email: string;
@@ -61,11 +62,13 @@ export const getUserByEmail = async (
 
 export const getUserData = async (
   userId: string
-) : Promise<User> => {
+) : Promise<AppUserData> => {
   const snapshot = await get(query(ref(db, 'users'), orderByChild('uid'), equalTo(userId)));
 
   if(snapshot.exists()) {
-    return snapshot.val();
+    const users = snapshot.val();
+    const userDataDetails = Object.values(users || {});
+    return userDataDetails[0] as AppUserData;
   }
   return Promise.reject(new Error('User data not found'));
 }

@@ -3,12 +3,14 @@ import logo from '/logo.svg';
 import { AppContext } from '../../store/app-context';
 
 function Header() {
-  const { user } = useContext(AppContext);
+  const { user, loading } = useContext(AppContext);
+
+  if (loading) return null;
 
   return (
-    <header className="flex flex-row justify-between items-start w-full px-10 py-4 ">
+    <header className="flex flex-row justify-between items-start w-full px-10 py-4 mx-6">
       <a href='/' className='cursor-pointer'>
-        <img src={logo} className='h-9 w-50 object-contain' alt='NoteBearer'/>
+        <img src={logo} className='h-9 min-w- object-contain' alt='NoteBearer'/>
       </a>
       <>
         { !user && (

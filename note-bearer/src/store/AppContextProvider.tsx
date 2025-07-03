@@ -3,7 +3,7 @@ import { auth } from "../config/firebase-config";
 import { useEffect, useState } from "react";
 import { getUserData } from "../services/user.services";
 import { AppContext } from "./app-context";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { User } from "firebase/auth";
 import type { AppUserData } from "../types/UserTypes";
 
@@ -12,14 +12,16 @@ type Props = {
 }
 
 export const AppContextProvider = ({ children }: Props) => {
-    const [user] = useAuthState(auth);
+    const [user, loading] = useAuthState(auth);
     const [appState, setAppState] = useState<{
-    user: User | null;
-    userData: AppUserData | null;
-  }>({
-    user: null,
-    userData: null,
-  });
+        user: User | null;
+        userData: AppUserData | null;
+        loading?: boolean;
+    }>({
+        user: null,
+        userData: null,
+        loading: true,
+    });
 
     useEffect(() => {
         async function fetchUserData() {
@@ -27,6 +29,7 @@ export const AppContextProvider = ({ children }: Props) => {
                 setAppState({
                     user: null,
                     userData: null,
+                    loading: false,
                 })
                 return;
             }
@@ -36,6 +39,7 @@ export const AppContextProvider = ({ children }: Props) => {
                 setAppState({
                     user,
                     userData: userData || null,
+                    loading: false,
                 });
                 console.log('User data fetched:', userData);
             } catch (error) {
@@ -43,14 +47,24 @@ export const AppContextProvider = ({ children }: Props) => {
                 setAppState({
                     user,
                     userData: null,
+                    loading: false,
                 });
             }
         }
-        fetchUserData();
+        if(!loading) {
+            fetchUserData();
+        }
     }, [user]);
 
+    const customSetAppState = (state: Partial<typeof appState>) => {
+        setAppState(prev => ({
+            ...prev,
+            ...state,
+        }));
+    };
+
     return (
-        <AppContext.Provider value={{ ...appState, setAppState }}>
+        <AppContext.Provider value={{ ...appState, setAppState: customSetAppState }}>
             {children}
         </AppContext.Provider>
     );
