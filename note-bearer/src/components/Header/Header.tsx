@@ -8,7 +8,7 @@ function Header() {
   if (loading) return null;
 
   return (
-    <header className="flex flex-row justify-between items-start w-full px-10 py-4 mx-6">
+    <header className="flex flex-row justify-between items-start w-full px-10 py-4  bg-transparent">
       <a href='/' className='cursor-pointer'>
         <img src={logo} className='h-9 min-w- object-contain' alt='NoteBearer'/>
       </a>
